@@ -179,7 +179,19 @@ const nativeConfig = {
       file: 'native/dist/styled-components.native.esm.js',
     }),
   ],
-  plugins: configBase.plugins.concat(minifierPlugin),
+  plugins: [
+    typescript({
+      // The build breaks if the tests are included by the typescript plugin.
+      // Since un-excluding them in tsconfig.json, we must explicitly exclude them
+      // here.
+      exclude: ['**/*.test.ts', '**/*.test.tsx', 'dist', 'src/test/types.tsx'],
+      outputToFilesystem: true,
+      tsconfig: './tsconfig.json',
+      compilerOptions: {
+        outDir: 'native/dist'
+      }
+    }),
+    ...configBase.plugins.slice(1), minifierPlugin],
 };
 
 export default [standaloneConfig, standaloneProdConfig, serverConfig, browserConfig, nativeConfig];
